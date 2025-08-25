@@ -47,7 +47,11 @@ function getVertexServiceAccount() {
   // First try to get from environment variable (for Vercel deployment)
   if (process.env.VERTEX_SERVICE_ACCOUNT_KEY) {
     try {
-      return JSON.parse(process.env.VERTEX_SERVICE_ACCOUNT_KEY);
+      const key = process.env.VERTEX_SERVICE_ACCOUNT_KEY;
+      // In Vercel, multiline env vars can have their newlines escaped.
+      // We need to replace '\\n' with '\n' before parsing.
+      const parsedKey = key.replace(/\\n/g, '\n');
+      return JSON.parse(parsedKey);
     } catch (error) {
       console.error('Error parsing VERTEX_SERVICE_ACCOUNT_KEY environment variable:', error);
       // Fall back to file if environment variable parsing fails

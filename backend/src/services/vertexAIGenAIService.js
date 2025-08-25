@@ -1,4 +1,5 @@
 const { VertexAI } = require('@google-cloud/vertexai');
+const { getVertexServiceAccount } = require('../utils/vercelServiceAccountHelper');
 
 // Initialize Vertex AI
 const project = process.env.GOOGLE_CLOUD_PROJECT || 'rainscare-58fdb';
@@ -8,7 +9,17 @@ let generativeModel;
 
 try {
   console.log('🔍 Initializing Vertex AI service...');
-  const vertex_ai = new VertexAI({ project, location });
+  const serviceAccount = getVertexServiceAccount();
+
+  // Explicitly pass credentials to the VertexAI constructor
+  const vertex_ai = new VertexAI({
+    project,
+    location,
+    credentials: {
+      client_email: serviceAccount.client_email,
+      private_key: serviceAccount.private_key,
+    }
+  });
 
   generativeModel = vertex_ai.getGenerativeModel({
     model: 'gemini-1.5-flash-001',
