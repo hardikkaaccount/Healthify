@@ -6,41 +6,55 @@ const fs = require('fs');
 const path = require('path');
 
 /**
- * Parses a service account key from an environment variable,
- * correctly handling newline characters in the private key.
+ * Parses a service account key from an environment variable.
+ * This function is designed to handle JSON strings that may have escaped newline
+ * characters in the private key.
  * @param {string} key The environment variable string.
- * @returns {Object} The parsed service account object.
+ * @returns {Object|null} The parsed service account object, or null if parsing fails.
  */
 function parseServiceAccountKey(key) {
-  if (!key) return null;
+  if (!key) {
+    return null;
+  }
   try {
-    // This handles keys where newlines are escaped (e.g., in a .env file)
-    const safeKey = key.replace(/\\n/g, "\\n");
-    return JSON.parse(safeKey);
+    // In many environments (like .env files or some CI/CD systems), newline
+    // characters within the private key are escaped as '\n'.
+    // JSON.parse requires these to be proper '\n' sequences within the string.
+    // This replacement ensures the key is parsed correctly.
+    const correctedKey = key.replace(/\\n/g, '\n');
+    return JSON.parse(correctedKey);
   } catch (error) {
-    // This handles keys where newlines are literal (e.g., from Vercel's UI)
-    try {
-        const safeKey2 = key.replace(/\n/g, "\\n");
-        return JSON.parse(safeKey2);
-    } catch (e) {
-        console.error('Error parsing service account key from environment variable:', e);
-        return null;
-    }
+    console.error('Error parsing service account key from environment variable:', error);
+    return null;
   }
 }
 
 /**
- * Gets Firebase service account credentials either from environment variable or file
- * @returns {Object} The service account credentials as a JavaScript object
+ * Retrieves Firebase service account credentials.
+ * It prioritizes environment variables (including Base64) and falls back to a local file.
+ * @returns {Object} The service account credentials.
+ * @throws {Error} If credentials are not found or are invalid.
  */
 function getFirebaseServiceAccount() {
-  const envKey = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
-  if (envKey) {
-    const parsedKey = parseServiceAccountKey(envKey);
-    if (parsedKey) return parsedKey;
+  // Prefer the Base64 encoded key for robustness
+  if (process.env.FIREBASE_SERVICE_ACCOUNT_KEY_B64) {
+    try {
+      const decodedKey = Buffer.from(process.env.FIREBASE_SERVICE_ACCOUNT_KEY_B64, 'base64').toString('utf-8');
+      return JSON.parse(decodedKey);
+    } catch (error) {
+      console.error('Error parsing Base64 Firebase service account key:', error);
+    }
   }
 
-  // Fall back to file-based approach (for local development)
+  // Fallback to the raw JSON key
+  if (process.env.FIREBASE_SERVICE_ACCOUNT_KEY) {
+    const parsedKey = parseServiceAccountKey(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
+    if (parsedKey) {
+      return parsedKey;
+    }
+  }
+
+  // Fall back to file-based approach for local development
   try {
     const serviceAccountPath = path.resolve(__dirname, '../config/service-account1.json');
     if (fs.existsSync(serviceAccountPath)) {
@@ -54,17 +68,31 @@ function getFirebaseServiceAccount() {
 }
 
 /**
- * Gets Vertex AI service account credentials either from environment variable or file
- * @returns {Object} The service account credentials as a JavaScript object
+ * Retrieves Vertex AI service account credentials.
+ * It prioritizes environment variables (including Base64) and falls back to a local file.
+ * @returns {Object} The service account credentials.
+ * @throws {Error} If credentials are not found or are invalid.
  */
 function getVertexServiceAccount() {
-  const envKey = process.env.VERTEX_SERVICE_ACCOUNT_KEY;
-  if (envKey) {
-    const parsedKey = parseServiceAccountKey(envKey);
-    if (parsedKey) return parsedKey;
+  // Prefer the Base64 encoded key for robustness
+  if (process.env.VERTEX_SERVICE_ACCOUNT_KEY_B64) {
+    try {
+      const decodedKey = Buffer.from(process.env.VERTEX_SERVICE_ACCOUNT_KEY_B64, 'base64').toString('utf-8');
+      return JSON.parse(decodedKey);
+    } catch (error) {
+      console.error('Error parsing Base64 Vertex AI service account key:', error);
+    }
   }
 
-  // Fall back to file-based approach (for local development)
+  // Fallback to the raw JSON key
+  if (process.env.VERTEX_SERVICE_ACCOUNT_KEY) {
+    const parsedKey = parseServiceAccountKey(process.env.VERTEX_SERVICE_ACCOUNT_KEY);
+    if (parsedKey) {
+      return parsedKey;
+    }
+  }
+
+  // Fall back to file-based approach for local development
   try {
     const serviceAccountPath = path.resolve(__dirname, '../config/service-account.json');
     if (fs.existsSync(serviceAccountPath)) {

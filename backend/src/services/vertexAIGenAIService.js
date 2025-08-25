@@ -14,9 +14,11 @@ try {
   const vertex_ai = new VertexAI({
     project: serviceAccount.project_id,
     location,
-    credentials: {
-      client_email: serviceAccount.client_email,
-      private_key: serviceAccount.private_key,
+    googleAuthOptions: {
+      credentials: {
+        client_email: serviceAccount.client_email,
+        private_key: serviceAccount.private_key,
+      }
     }
   });
 
