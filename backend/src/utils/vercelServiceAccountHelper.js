@@ -1,29 +1,37 @@
 /**
  * Helper utility for handling service account credentials in Vercel environment
- * This allows loading Firebase service account credentials from environment variables
- * instead of files when deployed to Vercel
  */
 
 const fs = require('fs');
 const path = require('path');
 
 /**
+ * Parses a service account key from an environment variable,
+ * correctly handling newline characters in the private key.
+ * @param {string} key The environment variable string.
+ * @returns {Object} The parsed service account object.
+ */
+function parseServiceAccountKey(key) {
+  if (!key) return null;
+  try {
+    // Replace literal newlines with escaped newlines for safe JSON parsing
+    const safeKey = key.replace(/\n/g, '\\n');
+    return JSON.parse(safeKey);
+  } catch (error) {
+    console.error('Error parsing service account key from environment variable:', error);
+    return null;
+  }
+}
+
+/**
  * Gets Firebase service account credentials either from environment variable or file
  * @returns {Object} The service account credentials as a JavaScript object
  */
 function getFirebaseServiceAccount() {
-  // First try to get from environment variable (for Vercel deployment)
-  if (process.env.FIREBASE_SERVICE_ACCOUNT_KEY) {
-    try {
-      const key = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
-      // In Vercel, multiline env vars can have their newlines escaped.
-      // We need to replace '\\n' with '\n' before parsing.
-      const parsedKey = key.replace(/\\n/g, '\n');
-      return JSON.parse(parsedKey);
-    } catch (error) {
-      console.error('Error parsing FIREBASE_SERVICE_ACCOUNT_KEY environment variable:', error);
-      // Fall back to file if environment variable parsing fails
-    }
+  const envKey = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
+  if (envKey) {
+    const parsedKey = parseServiceAccountKey(envKey);
+    if (parsedKey) return parsedKey;
   }
 
   // Fall back to file-based approach (for local development)
@@ -36,7 +44,7 @@ function getFirebaseServiceAccount() {
     console.error('Error loading Firebase service account from file:', error);
   }
 
-  throw new Error('Firebase service account credentials not found');
+  throw new Error('Firebase service account credentials not found or invalid');
 }
 
 /**
@@ -44,18 +52,10 @@ function getFirebaseServiceAccount() {
  * @returns {Object} The service account credentials as a JavaScript object
  */
 function getVertexServiceAccount() {
-  // First try to get from environment variable (for Vercel deployment)
-  if (process.env.VERTEX_SERVICE_ACCOUNT_KEY) {
-    try {
-      const key = process.env.VERTEX_SERVICE_ACCOUNT_KEY;
-      // In Vercel, multiline env vars can have their newlines escaped.
-      // We need to replace '\\n' with '\n' before parsing.
-      const parsedKey = key.replace(/\\n/g, '\n');
-      return JSON.parse(parsedKey);
-    } catch (error) {
-      console.error('Error parsing VERTEX_SERVICE_ACCOUNT_KEY environment variable:', error);
-      // Fall back to file if environment variable parsing fails
-    }
+  const envKey = process.env.VERTEX_SERVICE_ACCOUNT_KEY;
+  if (envKey) {
+    const parsedKey = parseServiceAccountKey(envKey);
+    if (parsedKey) return parsedKey;
   }
 
   // Fall back to file-based approach (for local development)
@@ -68,7 +68,7 @@ function getVertexServiceAccount() {
     console.error('Error loading Vertex AI service account from file:', error);
   }
 
-  throw new Error('Vertex AI service account credentials not found');
+  throw new Error('Vertex AI service account credentials not found or invalid');
 }
 
 module.exports = {
