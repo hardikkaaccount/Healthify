@@ -2,7 +2,6 @@ const { VertexAI } = require('@google-cloud/vertexai');
 const { getVertexServiceAccount } = require('../utils/vercelServiceAccountHelper');
 
 // Initialize Vertex AI
-const project = process.env.GOOGLE_CLOUD_PROJECT || 'rainscare-58fdb';
 const location = process.env.GOOGLE_CLOUD_LOCATION || 'us-central1';
 
 let generativeModel;
@@ -13,7 +12,7 @@ try {
 
   // Explicitly pass credentials to the VertexAI constructor
   const vertex_ai = new VertexAI({
-    project,
+    project: serviceAccount.project_id,
     location,
     credentials: {
       client_email: serviceAccount.client_email,
@@ -22,7 +21,7 @@ try {
   });
 
   generativeModel = vertex_ai.getGenerativeModel({
-    model: 'gemini-1.5-flash-001',
+    model: 'gemini-1.0-pro',
   });
   console.log('✅ Vertex AI service initialized successfully.');
 } catch (error) {
@@ -73,7 +72,7 @@ const createErrorFallbackResponse = (error, healthConditions = []) => {
     recommendation: "Unable to analyze image. You can try uploading a different image or enter the food name manually for analysis.",
     analysisMetadata: {
       timestamp: new Date().toISOString(),
-      model: 'gemini-1.5-flash-001',
+      model: 'gemini-1.0-pro',
       status: 'error',
       errorMessage: error ? error.message : 'Unknown error',
       healthConditionsConsidered: healthConditions,
@@ -109,7 +108,7 @@ const analyzeFoodImage = async (imageFile, healthConditions = []) => {
     if (parsedData) {
       parsedData.analysisMetadata = {
         timestamp: new Date().toISOString(),
-        model: 'gemini-1.5-flash-001',
+        model: 'gemini-1.0-pro',
       };
       return parsedData;
     } else {
