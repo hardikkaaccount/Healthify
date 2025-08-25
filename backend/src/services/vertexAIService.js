@@ -18,12 +18,12 @@ try {
   console.log('📍 Location:', process.env.GOOGLE_CLOUD_LOCATION || 'us-central1');
   
   vertexAI = new VertexAI({
-    project: process.env.GOOGLE_CLOUD_PROJECT || 'rainscare-58fdb',
+    project: vertexServiceAccount.project_id,
     location: process.env.GOOGLE_CLOUD_LOCATION || 'us-central1',
     googleAuthOptions: {
       credentials: {
         client_email: vertexServiceAccount.client_email,
-        private_key: vertexServiceAccount.private_key.replace(/\\n/g, '\n'),
+        private_key: vertexServiceAccount.private_key,
       },
     },
   });
