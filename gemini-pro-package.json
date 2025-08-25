@@ -1,0 +1,13 @@
+{
+  "name": "gemini-pro-test",
+  "version": "1.0.0",
+  "description": "Test script for Gemini 1.5 Pro model",
+  "type": "module",
+  "main": "test-gemini-pro.js",
+  "scripts": {
+    "start": "node test-gemini-pro.js"
+  },
+  "dependencies": {
+    "@google/genai": "^1.15.0"
+  }
+}

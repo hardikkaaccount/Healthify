@@ -1,0 +1,66 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Users can read/write their own data
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Food diary entries - users can only access their own
+    match /foodDiary/{entryId} {
+      allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+    }
+
+    // Health metrics - users can only access their own
+    match /healthMetrics/{metricId} {
+      allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+    }
+
+    // Favorite recipes - users can only access their own
+    match /favoriteRecipes/{recipeId} {
+      allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+    }
+
+    // User goals - users can only access their own
+    match /userGoals/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Shared recipes - public read, authenticated write
+    match /sharedRecipes/{recipeId} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+    }
+
+    // Allow anyone to read posts; only logged-in users can write
+    match /posts/{postId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    // Each user's health data is private (legacy)
+    match /healthData/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Marketing consent data
+    match /marketingConsent/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // User sessions for analytics
+    match /userSessions/{sessionId} {
+      allow read, write: if request.auth != null;
+    }
+
+    // Default fallback rule for anything else (deny all)
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

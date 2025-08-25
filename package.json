@@ -1,0 +1,74 @@
+{
+  "name": "rainscare-monorepo",
+  "version": "1.0.0",
+  "description": "Health and Nutrition App - Monorepo with Frontend and Backend",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "client",
+    "backend",
+    "admin"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:all": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\" \"npm run dev:admin\"",
+    "dev:frontend": "cd client && npm start",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:admin": "cd admin && npm start",
+    "build": "npm run build:frontend && npm run build:backend",
+    "build:frontend": "cd client && npm run build",
+    "build:backend": "cd backend && npm run build",
+    "vercel-build": "npm run install:all && npm run build",
+    "start": "npm run start:backend",
+    "start:backend": "cd backend && npm start",
+    "start:frontend": "cd client && npm start",
+    "install:all": "npm install && cd client && npm install && cd ../backend && npm install && cd ../admin && npm install",
+    "clean": "rimraf node_modules client/node_modules backend/node_modules",
+    "clean:build": "rimraf client/build backend/dist",
+    "test": "npm run test:frontend && npm run test:backend",
+    "test:frontend": "cd client && npm test",
+    "test:backend": "cd backend && npm test",
+    "lint": "npm run lint:frontend && npm run lint:backend",
+    "lint:frontend": "cd client && npm run lint",
+    "lint:backend": "cd backend && npm run lint"
+  },
+  "devDependencies": {
+    "concurrently": "^7.6.0",
+    "rimraf": "^4.1.2"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  },
+  "keywords": [
+    "health",
+    "nutrition",
+    "fitness",
+    "food-tracking",
+    "rainscare",
+    "react",
+    "nodejs",
+    "firebase",
+    "monorepo"
+  ],
+  "author": "Rainscare Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/rainscare.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/rainscare/issues"
+  },
+  "homepage": "https://github.com/yourusername/rainscare#readme",
+  "dependencies": {
+    "@dataconnect/generated": "file:dataconnect-generated/js/example-connector",
+    "@google-cloud/aiplatform": "^5.5.0",
+    "@google-cloud/vertexai": "^1.10.0",
+    "@google/genai": "^1.15.0",
+    "firebase": "^12.1.0",
+    "firebase-admin": "^13.4.0",
+    "react-datepicker": "^8.7.0",
+    "uuid": "^11.1.0"
+  }
+}
