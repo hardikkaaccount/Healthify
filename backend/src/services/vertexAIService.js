@@ -14,7 +14,7 @@ try {
   // Get Vertex AI service account credentials from environment variable or file
   const vertexServiceAccount = getVertexServiceAccount();
   
-  console.log('🏢 Project ID:', process.env.GOOGLE_CLOUD_PROJECT || 'rainscare-58fdb');
+  console.log('🏢 Project ID:', vertexServiceAccount.project_id);
   console.log('📍 Location:', process.env.GOOGLE_CLOUD_LOCATION || 'us-central1');
   
   vertexAI = new VertexAI({
@@ -28,9 +28,9 @@ try {
     },
   });
 
-  // Food Analysis Model (Text) - Using gemini-1.5-flash for fast text analysis
+  // Food Analysis Model (Text) - Using gemini-2.0-flash-001
   foodAnalysisModel = vertexAI.getGenerativeModel({
-    model: 'gemini-1.5-flash',
+    model: 'gemini-2.0-flash-001',
     generationConfig: {
       maxOutputTokens: 800,
       temperature: 0.3, // Lower temperature for more consistent food analysis
@@ -39,9 +39,9 @@ try {
     },
   });
 
-  // Image Analysis Model - Using gemini-1.5-pro for better image understanding
+  // Image Analysis Model - Using gemini-2.0-flash-001
   imageAnalysisModel = vertexAI.getGenerativeModel({
-    model: 'gemini-1.5-pro',
+    model: 'gemini-2.0-flash-001',
     generationConfig: {
       maxOutputTokens: 800,
       temperature: 0.3, // Lower temperature for consistent image analysis
@@ -50,9 +50,9 @@ try {
     },
   });
 
-  // Recipe Generation Model - Using gemini-1.5-flash for fast recipe generation
+  // Recipe Generation Model - Using gemini-2.0-flash-001
   recipeGenerationModel = vertexAI.getGenerativeModel({
-    model: 'gemini-1.5-flash',
+    model: 'gemini-2.0-flash-001',
     generationConfig: {
       maxOutputTokens: 1500,
       temperature: 0.7, // Higher temperature for more creative recipes
@@ -62,9 +62,9 @@ try {
   });
 
   console.log('✅ Vertex AI initialized successfully');
-  console.log('🍎 Food Analysis Model (Text): gemini-1.5-flash (fast text analysis)');
-  console.log('📸 Image Analysis Model: gemini-1.5-pro (better image understanding)');
-  console.log('👨‍🍳 Recipe Generation Model: gemini-1.5-flash (fast recipe generation)');
+  console.log('🍎 Food Analysis Model (Text): gemini-2.0-flash-001');
+  console.log('📸 Image Analysis Model: gemini-2.0-flash-001');
+  console.log('👨‍🍳 Recipe Generation Model: gemini-2.0-flash-001');
   console.log('🏢 Project: rainscare');
   console.log('📍 Location: us-central1');
 
@@ -90,7 +90,7 @@ const analyzeFoodImage = async (imageFile, healthConditions = []) => {
       throw new Error('Image Analysis model not initialized');
     }
 
-    console.log('🔄 Analyzing food image with Vertex AI Gemini 1.5 Pro...');
+    console.log('🔄 Analyzing food image with Vertex AI Gemini 2.0 Flash...');
     console.log('📁 Image info:', {
       mimetype: imageFile.mimetype,
       size: imageFile.size,
@@ -140,7 +140,7 @@ const analyzeFoodImage = async (imageFile, healthConditions = []) => {
     Provide accurate nutritional information and practical advice. The "calories" field must be a number.
     `;
 
-    console.log('🔄 Sending request to Vertex AI Gemini Pro...');
+    console.log('🔄 Sending request to Vertex AI Gemini 2.0 Flash...');
     const result = await imageAnalysisModel.generateContent({
       contents: [
         {
@@ -188,7 +188,7 @@ const analyzeFoodImage = async (imageFile, healthConditions = []) => {
         sodium: "0mg"
       },
       servingSize: "1 serving",
-      healthScore: 5,
+      healthScore": 5,
       isHealthy: false,
       recommendation: "Unable to analyze image. Please try uploading a clearer photo.",
       healthWarnings: ["Image analysis failed"],
@@ -211,7 +211,7 @@ const analyzeFoodByName = async (foodName, healthConditions = []) => {
       throw new Error('Food Analysis model not initialized');
     }
 
-    console.log(`🔄 Analyzing food by name "${foodName}" with Vertex AI Gemini 1.5 Flash...`);
+    console.log(`🔄 Analyzing food by name "${foodName}" with Vertex AI Gemini 2.0 Flash...`);
 
     const healthConditionsText = healthConditions.length > 0
       ? `The user has these health conditions: ${healthConditions.join(', ')}. `
@@ -254,7 +254,7 @@ const analyzeFoodByName = async (foodName, healthConditions = []) => {
     Provide accurate nutritional information and practical advice. The "calories" field must be a number.
     `;
 
-    console.log('🔄 Sending request to Vertex AI Gemini Flash...');
+    console.log('🔄 Sending request to Vertex AI Gemini 2.0 Flash...');
     const result = await foodAnalysisModel.generateContent({
       contents: [{ role: 'user', parts: [{ text: prompt }] }],
     });
@@ -282,13 +282,13 @@ const analyzeFoodByName = async (foodName, healthConditions = []) => {
     return {
       foodName: foodName,
       calories: 0,
-      nutritionFacts: {
-        protein: "0g",
-        carbs: "0g",
-        fat: "0g",
-        fiber: "0g",
-        sugar: "0g",
-        sodium: "0mg"
+      nutritionFacts": {
+        "protein": "0g",
+        "carbs": "0g",
+        "fat": "0g",
+        "fiber": "0g",
+        "sugar": "0g",
+        "sodium": "0mg"
       },
       servingSize: "1 serving",
       healthScore: 5,
@@ -299,7 +299,7 @@ const analyzeFoodByName = async (foodName, healthConditions = []) => {
       suitableFor: [],
       avoidIf: [],
       alternatives: [],
-      bestTimeToEat: "Anytime",
+      bestTimeToEat": "Anytime",
       portionControl: "Moderate portions",
       preparation: "Unknown",
       ingredients: []
@@ -314,7 +314,7 @@ const generateRecipe = async (ingredients, healthConditions = [], preferences = 
       throw new Error('Recipe Generation model not initialized');
     }
 
-    console.log('🔄 Generating recipe with Vertex AI Gemini 1.5 Flash...');
+    console.log('🔄 Generating recipe with Vertex AI Gemini 2.0 Flash...');
     console.log('🥘 Ingredients:', ingredients);
     console.log('🏥 Health conditions:', healthConditions);
     console.log('🍽️ Preferences:', preferences);
@@ -370,7 +370,7 @@ const generateRecipe = async (ingredients, healthConditions = [], preferences = 
 
     console.log('🔄 Sending recipe generation request to Vertex AI Gemini...');
     const result = await recipeGenerationModel.generateContent({
-      contents: [
+      contents": [
         {
           role: 'user',
           parts: [{ text: prompt }],
@@ -407,7 +407,7 @@ const generateRecipe = async (ingredients, healthConditions = [], preferences = 
       ingredients: ingredients.map(ing => ({
         name: ing,
         amount: "as needed",
-        notes: ""
+        notes": ""
       })),
       instructions: [
         "Prepare all ingredients",
@@ -418,15 +418,15 @@ const generateRecipe = async (ingredients, healthConditions = [], preferences = 
       cookingTime: "30 minutes",
       prepTime: "15 minutes",
       servings: 4,
-      difficulty: "Easy",
+      difficulty": "Easy",
       nutritionInfo: {
-        calories: "Varies",
-        protein: "Varies",
-        carbs: "Varies",
-        fat: "Varies",
-        fiber: "Varies"
+        "calories": "Varies",
+        "protein": "Varies",
+        "carbs": "Varies",
+        "fat": "Varies",
+        "fiber": "Varies"
       },
-      healthBenefits: ["Nutritious ingredients"],
+      healthBenefits": ["Nutritious ingredients"],
       suitableFor: ["General health"],
       tags: ["healthy"],
       tips: ["Adjust seasoning to taste"]
