@@ -65,6 +65,7 @@ const extractJsonFromResponse = (responseText) => {
 // Helper function to create a detailed error fallback response
 const createErrorFallbackResponse = (error, healthConditions = []) => {
   console.log('🔄 Creating error fallback response...');
+  console.error('Error details:', JSON.stringify(error, null, 2));
   return {
     foodName: "Analysis Failed",
     description: "Unable to process image",
