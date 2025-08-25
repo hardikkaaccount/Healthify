@@ -23,7 +23,7 @@ try {
   });
 
   generativeModel = vertex_ai.getGenerativeModel({
-    model: 'gemini-2.0-flash-001',
+    model: 'gemini-2.5-flash',
   });
   console.log('✅ Vertex AI service initialized successfully.');
 } catch (error) {
@@ -75,7 +75,7 @@ const createErrorFallbackResponse = (error, healthConditions = []) => {
     recommendation: "Unable to analyze image. You can try uploading a different image or enter the food name manually for analysis.",
     analysisMetadata: {
       timestamp: new Date().toISOString(),
-      model: 'gemini-2.0-flash-001',
+      model: 'gemini-2.5-flash',
       status: 'error',
       errorMessage: error ? error.message : 'Unknown error',
       healthConditionsConsidered: healthConditions,
@@ -111,7 +111,7 @@ const analyzeFoodImage = async (imageFile, healthConditions = []) => {
     if (parsedData) {
       parsedData.analysisMetadata = {
         timestamp: new Date().toISOString(),
-        model: 'gemini-2.0-flash-001',
+        model: 'gemini-2.5-flash',
       };
       return parsedData;
     } else {
