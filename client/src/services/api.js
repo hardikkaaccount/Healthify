@@ -1,34 +1,9 @@
 import axios from 'axios';
 import { auth } from '../firebase/config';
 
-// Helper function to build the API base URL
-const getApiBaseUrl = () => {
-  const apiUrl = process.env.REACT_APP_API_URL;
-
-  // If REACT_APP_API_URL is not defined, fall back to localhost for development
-  if (!apiUrl) {
-    return 'http://localhost:5000/api';
-  }
-
-  // Ensure the URL has a protocol
-  let fullUrl = apiUrl;
-  if (!fullUrl.startsWith('http://') && !fullUrl.startsWith('https://')) {
-    fullUrl = `https://${fullUrl}`;
-  }
-
-  // Ensure the URL ends with /api
-  if (!fullUrl.endsWith('/api')) {
-    // Remove trailing slash if it exists, then add /api
-    fullUrl = `${fullUrl.replace(/\/$/, '')}/api`;
-  }
-
-  return fullUrl;
-};
-
-
 // Create axios instance with base configuration
 const api = axios.create({
-  baseURL: getApiBaseUrl(),
+  baseURL: process.env.REACT_APP_API_URL || 'http://localhost:5000/api',
   timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
