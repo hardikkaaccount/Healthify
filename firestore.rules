@@ -15,8 +15,14 @@ service cloud.firestore {
     
     // Users can read/write their own daily health metrics (water, steps, sleep)
     match /dailyHealthMetrics/{metricId} {
-      allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
-      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+      // Allow reading if the user's ID is in the document ID, which is structured as {userId}_{date}
+      allow read: if request.auth != null && metricId.split('_')[0] == request.auth.uid;
+
+      // Allow creating and updating (for set with merge).
+      // This checks the incoming document's data for the correct userId.
+      allow create, update: if request.auth != null && request.resource.data.userId == request.auth.uid;
+
+      // Note: delete is intentionally not allowed by this rule.
     }
 
     // Users can read/write their own health metrics
