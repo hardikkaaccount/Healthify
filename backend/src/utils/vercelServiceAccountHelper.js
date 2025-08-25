@@ -1,33 +1,18 @@
 /**
- * Helper utility for handling service account credentials in Vercel environment
- * This allows loading Firebase service account credentials from environment variables
- * instead of files when deployed to Vercel
+ * Helper utility for handling service account credentials.
+ * This version is simplified to prioritize loading from a file for testing purposes.
  */
 
 const fs = require('fs');
 const path = require('path');
 
 /**
- * Gets Firebase service account credentials either from environment variable or file
+ * Gets Firebase service account credentials from file.
  * @returns {Object} The service account credentials as a JavaScript object
  */
 function getFirebaseServiceAccount() {
-  // First try to get from environment variable (for Vercel deployment)
-  if (process.env.FIREBASE_SERVICE_ACCOUNT_KEY) {
-    try {
-      const key = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
-      // In Vercel, multiline env vars can have their newlines escaped.
-      // We need to replace '\\n' with '\n' before parsing.
-      const parsedKey = key.replace(/\\n/g, '\n');
-      return JSON.parse(parsedKey);
-    } catch (error) {
-      console.error('Error parsing FIREBASE_SERVICE_ACCOUNT_KEY environment variable:', error);
-      // Fall back to file if environment variable parsing fails
-    }
-  }
-
-  // Fall back to file-based approach (for local development)
   try {
+    // This path is relative to the utils directory
     const serviceAccountPath = path.resolve(__dirname, '../config/service-account1.json');
     if (fs.existsSync(serviceAccountPath)) {
       return require(serviceAccountPath);
@@ -36,26 +21,16 @@ function getFirebaseServiceAccount() {
     console.error('Error loading Firebase service account from file:', error);
   }
 
-  throw new Error('Firebase service account credentials not found');
+  throw new Error('Firebase service account credentials file not found at backend/src/config/service-account1.json');
 }
 
 /**
- * Gets Vertex AI service account credentials either from environment variable or file
+ * Gets Vertex AI service account credentials from file.
  * @returns {Object} The service account credentials as a JavaScript object
  */
 function getVertexServiceAccount() {
-  // First try to get from environment variable (for Vercel deployment)
-  if (process.env.VERTEX_SERVICE_ACCOUNT_KEY) {
-    try {
-      return JSON.parse(process.env.VERTEX_SERVICE_ACCOUNT_KEY);
-    } catch (error) {
-      console.error('Error parsing VERTEX_SERVICE_ACCOUNT_KEY environment variable:', error);
-      // Fall back to file if environment variable parsing fails
-    }
-  }
-
-  // Fall back to file-based approach (for local development)
   try {
+    // This path is relative to the utils directory
     const serviceAccountPath = path.resolve(__dirname, '../config/service-account.json');
     if (fs.existsSync(serviceAccountPath)) {
       return require(serviceAccountPath);
@@ -64,7 +39,7 @@ function getVertexServiceAccount() {
     console.error('Error loading Vertex AI service account from file:', error);
   }
 
-  throw new Error('Vertex AI service account credentials not found');
+  throw new Error('Vertex AI service account credentials file not found at backend/src/config/service-account.json');
 }
 
 module.exports = {

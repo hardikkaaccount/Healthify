@@ -16,7 +16,7 @@ class TempDailyIntakeService {
       // Create directories if they don't exist
       await fs.mkdir(this.dataDir, { recursive: true });
       await fs.mkdir(this.archiveDir, { recursive: true });
-      
+
       // Check if daily reset is needed
       await this.checkAndResetDaily();
     } catch (error) {
@@ -50,7 +50,7 @@ class TempDailyIntakeService {
       try {
         const currentData = await fs.readFile(this.dailyFile, 'utf8');
         const parsedData = JSON.parse(currentData);
-        
+
         if (parsedData.date && parsedData.date !== today && parsedData.entries.length > 0) {
           const archiveFile = path.join(this.archiveDir, `intake-${parsedData.date}.json`);
           await fs.writeFile(archiveFile, JSON.stringify({
@@ -75,10 +75,10 @@ class TempDailyIntakeService {
       };
 
       await fs.writeFile(this.dailyFile, JSON.stringify(freshData, null, 2));
-      
+
       // Update last reset date
       await fs.writeFile(this.lastResetFile, JSON.stringify({ date: today }, null, 2));
-      
+
       console.log(`Daily intake reset completed for ${today}`);
     } catch (error) {
       console.error('Error performing daily reset:', error);
@@ -88,7 +88,7 @@ class TempDailyIntakeService {
   async addFoodEntry(userId, foodData) {
     try {
       await this.checkAndResetDaily();
-      
+
       let currentData;
       try {
         const fileContent = await fs.readFile(this.dailyFile, 'utf8');
@@ -118,7 +118,7 @@ class TempDailyIntakeService {
 
       // Add to entries
       currentData.entries.push(newEntry);
-      
+
       // Update totals
       currentData.totalCalories += foodData.calories || 0;
       currentData.totalProtein += foodData.protein || 0;
@@ -128,7 +128,7 @@ class TempDailyIntakeService {
 
       // Save updated data
       await fs.writeFile(this.dailyFile, JSON.stringify(currentData, null, 2));
-      
+
       return newEntry;
     } catch (error) {
       console.error('Error adding food entry to temp storage:', error);
@@ -139,13 +139,13 @@ class TempDailyIntakeService {
   async getDailyIntake(userId) {
     try {
       await this.checkAndResetDaily();
-      
+
       const fileContent = await fs.readFile(this.dailyFile, 'utf8');
       const data = JSON.parse(fileContent);
-      
+
       // Filter entries for specific user (if needed)
       const userEntries = data.entries.filter(entry => entry.userId === userId);
-      
+
       // Calculate user-specific totals
       const userTotals = userEntries.reduce((totals, entry) => ({
         calories: totals.calories + (entry.calories || 0),
@@ -176,20 +176,20 @@ class TempDailyIntakeService {
     try {
       const fileContent = await fs.readFile(this.dailyFile, 'utf8');
       const data = JSON.parse(fileContent);
-      
-      const entryIndex = data.entries.findIndex(entry => 
+
+      const entryIndex = data.entries.findIndex(entry =>
         entry.id === entryId && entry.userId === userId
       );
-      
+
       if (entryIndex === -1) {
         throw new Error('Entry not found');
       }
 
       const removedEntry = data.entries[entryIndex];
-      
+
       // Remove entry
       data.entries.splice(entryIndex, 1);
-      
+
       // Update totals
       data.totalCalories -= removedEntry.calories || 0;
       data.totalProtein -= removedEntry.protein || 0;
@@ -199,7 +199,7 @@ class TempDailyIntakeService {
 
       // Save updated data
       await fs.writeFile(this.dailyFile, JSON.stringify(data, null, 2));
-      
+
       return true;
     } catch (error) {
       console.error('Error removing food entry from temp storage:', error);
@@ -224,7 +224,7 @@ class TempDailyIntakeService {
         .filter(file => file.startsWith('intake-') && file.endsWith('.json'))
         .map(file => file.replace('intake-', '').replace('.json', ''))
         .sort((a, b) => new Date(b) - new Date(a)); // Most recent first
-      
+
       return dates;
     } catch (error) {
       return [];
@@ -237,12 +237,12 @@ class TempDailyIntakeService {
       const files = await fs.readdir(this.archiveDir);
       const cutoffDate = new Date();
       cutoffDate.setDate(cutoffDate.getDate() - 30);
-      
+
       for (const file of files) {
         if (file.startsWith('intake-') && file.endsWith('.json')) {
           const dateStr = file.replace('intake-', '').replace('.json', '');
           const fileDate = new Date(dateStr);
-          
+
           if (fileDate < cutoffDate) {
             await fs.unlink(path.join(this.archiveDir, file));
             console.log(`Cleaned up old archive: ${file}`);
